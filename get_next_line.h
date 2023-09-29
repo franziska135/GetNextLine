@@ -19,6 +19,8 @@
 # define BUFFER_SIZE 42
 # endif
 
+# define FALSE 0
+
 typedef struct s_list
 {
 	char			*content;

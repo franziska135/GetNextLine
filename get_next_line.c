@@ -32,22 +32,23 @@ char	*get_next_line(int fd)
 	line = NULL;
 	//read from fd, add to linked list storage
 	read_fd_to_storage(fd, &storage, &gelesen);
-	if (storage == NULL)
-		return (NULL);
+	if (storage == NULL) /*if file is empty*/
+		return (NULL); 
 	//copy from storage to line
+	ft_extract_line(storage, &line)
 	//clean up storage
-	return(line);
+	return (line);
 }
 
 void	read_fd_to_storage(int fd, t_list **storage, int *ptr_gelesen, int BUFFER_SIZE)
 {
 	char	*buffer;
 
-	buffer = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
-	if (!buffer)
-		return ;
-	while (newline(*storage) == FALSE && *ptr_gelesen != NULL)
+	while (ft_newline(*storage) == FALSE && *ptr_gelesen != NULL)
 	{
+		buffer = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
+		if (!buffer)
+			return ;
 		ptr_gelesen = (int)read(fd, buffer, BUFFER_SIZE);
 		if ((*storage == NULL && *ptr_gelesen == 0) || *ptr_gelesen == -1)
 		{
@@ -55,5 +56,48 @@ void	read_fd_to_storage(int fd, t_list **storage, int *ptr_gelesen, int BUFFER_S
 			return ;
 		}
 		buffer[*ptr_gelesen] = '\0';
+		ft_add_to_storage(storage, buffer, *ptr_gelesen);
+		free(buffer);
 	}
+}
+
+/*adding content of bufer to end of storage*/
+void	ft_add_to_storage(t_list **storage, char *buffer, int gelesen)
+{
+	int	i;
+	t_list *last;
+	t_list	*new_node;
+
+	new_node = malloc(sizeof(t_list));
+	if (!new_node)
+		return ;
+	new_node->next = NULL;
+	new_node->content = malloc(sizeof(char) * (gelesen + 1));
+	if (new_node->content == NULL)
+		return ;
+	while (buffer[i] && i < gelesen)
+	{
+		new_node->content[i] = buffer[i];
+		i++;
+	}
+	new_node->content[i] = '\0';
+	if (*storage == NULL)
+	{
+		*storage = new_node;
+		return ;
+	}
+	last = ft_lst_get_last(*storage);
+	last->next = new_node;
+}
+
+/*extracting characers from storage, storing them on line*/
+/*stopping after the first \n*/
+void	extract_line(t_list *storage, char **line)
+{
+	int	i;
+	int	j;
+	/*if nothing to extract*/
+	if (storage == NULL)
+		return ;
+	
 }

@@ -25,7 +25,7 @@ int	ft_newline(t_list *storage)
 }
 
 /*returning pointer to the last note in storage*/
-t_list *ft_lst_get_last(t_list *storage)
+t_list	*ft_lst_get_last(t_list *storage)
 {
 	t_list	*current;
 
@@ -48,6 +48,41 @@ void	generate_line(char **line, t_list *storage)
 	while (storage)
 	{
 		i = 0;
-		
+		while (storage->contetn[i])
+		{
+			if (storage->content[i] == '\n')
+			{
+				len++;
+				break;
+			}
+			len++;
+			i++;
+		}
+		storage = storage->next;
 	}
+	*line = malloc(sizeof(char) * (len + 1));
+}
+/*free storage*/
+void	free_storage(t_list *storage)
+{
+	t_list	*position;
+	t_list	*next;
+
+	position = storage;
+	{
+		free(position->content);
+		next = position->next;
+		free(position);
+		position = next;
+	}
+}
+
+int	ft_strlen(const char *str)
+{
+	int i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
 }

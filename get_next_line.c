@@ -30,9 +30,9 @@ char	*get_next_line(int fd)
 		return (NULL);
 	storage = NULL; //initializing list with NULL
 	gelesen = 1;
-	line = NULL;
+	//line = NULL;
 	/*read from fd, add to linked list storage*/
-	read_fd_to_storage(fd, &storage, &gelesen);
+	read_buffer_storage(fd, &storage, &gelesen);
 	if (storage == NULL) /*if file is empty*/
 		return (NULL); 
 	/*copy from storage to line*/
@@ -49,13 +49,13 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-void	read_fd_to_storage(int fd, t_list **storage, int *ptr_gelesen)
+void	read_buffer_storage(int fd, t_list **storage, int *ptr_gelesen)
 {
 	char	*buffer;
 
 	while (ft_newline(*storage) == FALSE && *ptr_gelesen != NULL)
 	{
-		buffer = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
+		buffer = malloc((sizeof(char) * (BUFFER_SIZE + 1)));
 		if (!buffer)
 			return ;
 		*ptr_gelesen = (int)read(fd, buffer, BUFFER_SIZE);
@@ -74,9 +74,10 @@ void	read_fd_to_storage(int fd, t_list **storage, int *ptr_gelesen)
 void	ft_buffer_to_storage(t_list **storage, char *buffer, int gelesen)
 {
 	int		i;
-	t_list	*last;
+	t_list	*last_node;
 	t_list	*new_node;
 
+	i = 0;
 	new_node = malloc(sizeof(t_list));
 	if (!new_node)
 		return ;
@@ -84,6 +85,7 @@ void	ft_buffer_to_storage(t_list **storage, char *buffer, int gelesen)
 	if (new_node->content == NULL)
 		return ;
 	new_node->next = NULL;
+	//insert strlcpy
 	while (buffer[i] && i < gelesen)
 	{
 		new_node->content[i] = buffer[i];
@@ -95,8 +97,8 @@ void	ft_buffer_to_storage(t_list **storage, char *buffer, int gelesen)
 		*storage = new_node;
 		return ;
 	}
-	last = ft_lst_get_last(*storage);
-	last->next = new_node;
+	last_node = retreive_last_node(*storage);
+	last_node->next = new_node;
 }
 
 /*extracting characers from storage, storing them on line*/

@@ -32,16 +32,14 @@ int	ft_newline(t_list *storage)
 }
 
 /*returning pointer to the last note in storage*/
-t_list	*ft_lst_get_last(t_list *storage)
+t_list	*retreive_last_node(t_list *storage)
 {
-	t_list	*position;
+	t_list	*temporary_ptr;
 
-	position = storage;
-	while (storage && position->next)
-	{
-		position = position->next;
-	}
-	return (position);
+	*temporary_ptr = *storage;
+	while (temporary_ptr->next != NULL)
+		temporary_ptr = temporary_ptr->next;
+	return (temporary_ptr);
 }
 
 /*calculating number of char in current line

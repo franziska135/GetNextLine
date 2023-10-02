@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 /*read will return the number of bytes read -> compare with expected value for protection?*/
 /*if read returns 0, the end of file is reached*/
+/*read -1 if error*/
 //read(fd, buffer size, nbr_of_bytes)
 //storebuffer in static stash
 //check if in stash a \n stored
@@ -27,7 +28,7 @@ char	*get_next_line(int fd)
 	/*if prolem with opening fd: -1*/
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, &line, 0) < 0)
 		return (NULL);
-	storage = NULL;
+	storage = NULL; //initializing list with NULL
 	gelesen = 1;
 	line = NULL;
 	/*read from fd, add to linked list storage*/
@@ -57,20 +58,20 @@ void	read_fd_to_storage(int fd, t_list **storage, int *ptr_gelesen)
 		buffer = malloc((BUFFER_SIZE + 1) * (sizeof(char)));
 		if (!buffer)
 			return ;
-		ptr_gelesen = (int)read(fd, buffer, BUFFER_SIZE);
+		*ptr_gelesen = (int)read(fd, buffer, BUFFER_SIZE);
 		if ((*storage == NULL && *ptr_gelesen == 0) || *ptr_gelesen == -1)
 		{
 			free(buffer);
 			return ;
 		}
 		buffer[*ptr_gelesen] = '\0';
-		ft_add_to_storage(storage, buffer, *ptr_gelesen);
+		ft_buffer_to_storage(storage, buffer, *ptr_gelesen);
 		free(buffer);
 	}
 }
 
-/*adding content of bufer to end of storage*/
-void	ft_add_to_storage(t_list **storage, char *buffer, int gelesen)
+/*adding content of buffer to end of storage*/
+void	ft_buffer_to_storage(t_list **storage, char *buffer, int gelesen)
 {
 	int		i;
 	t_list	*last;
@@ -79,10 +80,10 @@ void	ft_add_to_storage(t_list **storage, char *buffer, int gelesen)
 	new_node = malloc(sizeof(t_list));
 	if (!new_node)
 		return ;
-	new_node->next = NULL;
 	new_node->content = malloc(sizeof(char) * (gelesen + 1));
 	if (new_node->content == NULL)
 		return ;
+	new_node->next = NULL;
 	while (buffer[i] && i < gelesen)
 	{
 		new_node->content[i] = buffer[i];

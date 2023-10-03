@@ -13,72 +13,64 @@
 /*if read returns 0, the end of file is reached*/
 /*read -1 if error*/
 //read(fd, buffer size, nbr_of_bytes)
-//storebuffer in static stash
-//check if in stash a \n stored
-//if \n than extract everything up until \n in another variable
-//remove this from static stash_
 #include "get_next_line.h"
 
 char	*get_next_line(int fd)
 {
 	static t_list	*storage;
-	char			*line;
+	char			*output;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, &line, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, &output, 0) < 0)
 		return (NULL);
 	storage = NULL;
-	line = NULL;
-	read_buffer_storage(fd, &storage);
+	output = NULL;
+	read_to_temp(fd, &storage);
 	//if storage is still empty after reading
 	if (storage == NULL)
 		return (NULL);
 	//copy from storage to line
-	extract_line(storage, &line);
+	storage_to_output(storage, &output);
 	//clean up storage
 	free_storage(&storage);
-	if (line[0] == '\0')
+	if (output[0] == '\0')
 	{
 		free_storage(storage);
 		storage = NULL;
-		free(line);
+		free(output);
 		return (0);
 	}
-	return (line);
+	return (output);
 }
 
-void	read_buffer_storage(int fd, t_list *storage)
+void	read_to_temp(int fd, t_list *storage)
 {
 	char	*temp;
-	int		gelesen;
+	int		i;
 
-	gelesen = 1;
-	//why does newline only need the last node?
-	//check if the || condition is correct
-	while (newline(&storage) == 1 && gelesen != 0)
+	i = 1;
+	while (newline(&storage) == 0 && i != 0)
 	{
 		temp = malloc((sizeof(char) * (BUFFER_SIZE + 1)));
 		if (!temp)
 			return ;
-		gelesen = (int)read(fd, temp, BUFFER_SIZE);
-		if ((storage == NULL && gelesen == 0) || gelesen == -1)
+		i = (int)read(fd, temp, BUFFER_SIZE);
+		temp[i] = '\0';
+		if ((storage == NULL && i == 0) || i == -1)
 		{
 			free(temp);
 			return ;
 		}
-		temp[gelesen] = '\0';
-		ft_buffer_to_storage(&storage, temp, gelesen);
+		temp_to_storage(&storage, temp, i);
 		free(temp);
 	}
 }
 
-/*adding content of buffer to end of storage*/
-void	ft_buffer_to_storage(t_list *storage, char *temp, int gelesen)
+/*add content of temp to end of storage*/
+void	temp_to_storage(t_list *storage, char *temp, int gelesen)
 {
-	int		i;
 	t_list	*last_node;
 	t_list	*new_node;
 
-	i = 0;
 	new_node = malloc(sizeof(t_list));
 	if (!new_node)
 		return ;
@@ -86,56 +78,54 @@ void	ft_buffer_to_storage(t_list *storage, char *temp, int gelesen)
 	if (new_node->content == NULL)
 		return ;
 	new_node->next = NULL;
-	//insert strlcpy
-	while (temp[i] && i < gelesen)
-	{
-		new_node->content[i] = temp[i];
-		i++;
-	}
-	new_node->content[i] = '\0';
+	//copy content of temp to new_node
+	ft_strcpy(temp, new_node->content, gelesen);
+	//add new_node to end of structure
 	if (storage != NULL)
 	{
-		last_node = retrieve_last_node(*storage);
+		last_node = storage;
+		while (last_node->next != NULL)
+			last_node = last_node->next;
 		last_node->next = new_node;
 	}
+	//if structure is empty, add new_node
 	else
 		storage = new_node;
 	return ;
 }
 
-/*extracting characers from storage, storing them on line*/
-/*stopping after the first \n*/
-void	extract_line(t_list *storage, char *line)
+/*chars from storage to output and stop at \n*/
+void	storage_to_output(t_list *storage, char *output)
 {
 	int	i;
 	int	j;
-	int	len;
+	int	length;
 
-	len = count_length(storage);
-	line = malloc(sizeof(char) * (len + 1));
-	if (!line || storage == NULL)
+	length = count_length(storage);
+	output = malloc(sizeof(char) * (length + 1));
+	if (!output || storage == NULL)
 		return ;
 	j = 0;
-	while (storage)
+	while (storage != NULL)
 	{
 		i = 0;
 		while (storage->content[i])
 		{
 			if (storage->content[i] == '\n')
 			{
-				line[j++] = storage->content[i];
+				output[j++] = storage->content[i];
 				break ;
 			}
-			line[j++] = storage->content[i++];
+			output[j++] = storage->content[i++];
 		}
 		storage = storage->next;
 	}
-	line[j] = '\0';
+	output[j] = '\0';
 }
 
-/*after extracting the line that was read, no chars a needed anymore
-clearing storage so only chars that have not been returned at the end of
-gnl remain in static stash*/
+/*after extracting the line that was read, 
+clearing storage and only chars that have not been read at the end of
+gnl remain for next function call*/
 void	free_storage()
 {
 	t_list	*last;

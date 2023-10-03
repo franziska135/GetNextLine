@@ -17,7 +17,6 @@ int	newline(t_list *storage)
 {
 	int		i;
 	t_list	*position;
-	char	*content;
 
 	if (storage == NULL)
 		return (0);
@@ -28,25 +27,26 @@ int	newline(t_list *storage)
 		position = position->next;
 	}
 	i = 0;
-	content = position->content;
-	while (content[i])
+	while (position->content[i])
 	{
-		if (content[i] == '\n')
+		if (position->content[i] == '\n')
 			return (1);
 		i++;
 	}
 	return (0);
 }
 
-/*returning pointer to the last note in storage*/
-t_list	*retrieve_last_node(t_list *storage)
+void	ft_strcpy(char *src, char *dest, int gelesen)
 {
-	t_list	*temporary_ptr;
+	int	i;
 
-	*temporary_ptr = *storage;
-	while (temporary_ptr->next != NULL)
-		temporary_ptr = temporary_ptr->next;
-	return (temporary_ptr);
+	i = 0;
+	while (src[i] && i < gelesen)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
 }
 
 /*calculating number of char in current line
@@ -99,3 +99,14 @@ int	ft_strlen(const char *str)
 		i++;
 	return (i);
 }
+
+/*returning pointer to the last node in storage*/
+// t_list	*retrieve_last_node(t_list *storage)
+// {
+// 	t_list	*temporary_ptr;
+
+// 	*temporary_ptr = *storage;
+// 	while (temporary_ptr->next != NULL)
+// 		temporary_ptr = temporary_ptr->next;
+// 	return (temporary_ptr);
+// }

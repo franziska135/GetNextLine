@@ -23,16 +23,13 @@ char	*get_next_line(int fd)
 {
 	static t_list	*storage;
 	char			*line;
-	int				gelesen;
 
 	/*if prolem with opening fd: -1*/
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, &line, 0) < 0)
 		return (NULL);
 	storage = NULL; //initializing list with NULL
-	gelesen = 1;
-	//line = NULL;
-	/*read from fd, add to linked list storage*/
-	read_buffer_storage(fd, &storage, &gelesen);
+	line = NULL;
+	read_buffer_storage(fd, &storage);
 	if (storage == NULL) /*if file is empty*/
 		return (NULL); 
 	/*copy from storage to line*/
@@ -49,23 +46,26 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-void	read_buffer_storage(int fd, t_list **storage, int *ptr_gelesen)
+void	read_buffer_storage(int fd, t_list **storage)
 {
 	char	*buffer;
+	int		gelesen;
 
-	while (ft_newline(*storage) == FALSE && *ptr_gelesen != NULL)
+	gelesen = 0;
+	//why does newline only need the last node?
+	while (newline(*storage) == 1 && gelesen == 0)
 	{
 		buffer = malloc((sizeof(char) * (BUFFER_SIZE + 1)));
 		if (!buffer)
 			return ;
-		*ptr_gelesen = (int)read(fd, buffer, BUFFER_SIZE);
-		if ((*storage == NULL && *ptr_gelesen == 0) || *ptr_gelesen == -1)
+		gelesen = (int)read(fd, buffer, BUFFER_SIZE);
+		if ((*storage == NULL && gelesen == 0) || gelesen == -1)
 		{
 			free(buffer);
 			return ;
 		}
-		buffer[*ptr_gelesen] = '\0';
-		ft_buffer_to_storage(storage, buffer, *ptr_gelesen);
+		buffer[gelesen] = '\0';
+		ft_buffer_to_storage(storage, buffer, gelesen);
 		free(buffer);
 	}
 }
@@ -134,7 +134,7 @@ void	extract_line(t_list *storage, char **line)
 /*after extracting the line that was read, no chars a needed anymore
 clearing storage so only chars that have not been returned at the end of
 gnl remain in static stash*/
-void	clean_stash()
+void	ft_clean_storage()
 {
 	t_list	*last;
 	t_list	*clean_node;

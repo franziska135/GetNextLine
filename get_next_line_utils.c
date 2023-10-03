@@ -13,18 +13,25 @@
 #include "get_next_line.h"
 
 /*looking for \n in linked list*/
-int	ft_newline(t_list *storage)
+int	newline(t_list *storage)
 {
 	int		i;
 	t_list	*position;
+	char	*content;
 
 	if (storage == NULL)
 		return (0);
-	position = ft_lst_get_last(storage);
-	i = 0;
-	while (position->content[i])
+	position = storage;
+	//traversing list to last node
+	while (position->next != NULL)
 	{
-		if (position->content[i] == '\n')
+		position = position->next;
+	}
+	i = 0;
+	content = position->content;
+	while (content[i])
+	{
+		if (content[i] == '\n')
 			return (1);
 		i++;
 	}

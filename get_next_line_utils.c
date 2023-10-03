@@ -39,7 +39,7 @@ int	newline(t_list *storage)
 }
 
 /*returning pointer to the last note in storage*/
-t_list	*retreive_last_node(t_list *storage)
+t_list	*retrieve_last_node(t_list *storage)
 {
 	t_list	*temporary_ptr;
 
@@ -51,12 +51,12 @@ t_list	*retreive_last_node(t_list *storage)
 
 /*calculating number of char in current line
 includig \n if there is one, allocating memory*/
-void	generate_line(char **line, t_list *storage)
+int	count_length(t_list *storage)
 {
 	int	i;
-	int	len;
+	int	length;
 
-	len = 0;
+	length = 0;
 	while (storage)
 	{
 		i = 0;
@@ -64,15 +64,15 @@ void	generate_line(char **line, t_list *storage)
 		{
 			if (storage->content[i] == '\n')
 			{
-				len++;
+				length++;
 				break ;
 			}
-			len++;
+			length++;
 			i++;
 		}
 		storage = storage->next;
 	}
-	*line = malloc(sizeof(char) * (len + 1));
+	return (length);
 }
 
 /*free storage*/
@@ -92,7 +92,7 @@ void	free_storage(t_list *storage)
 
 int	ft_strlen(const char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (str[i])

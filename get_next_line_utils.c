@@ -13,15 +13,15 @@
 #include "get_next_line.h"
 
 /*looking for \n in linked list*/
-int	newline(t_list *storage)
+//traversing list to last node
+int	newline(t_list **storage)
 {
 	int		i;
 	t_list	*position;
 
 	if (storage == NULL)
 		return (0);
-	position = storage;
-	//traversing list to last node
+	position = *storage;
 	while (position->next != NULL)
 	{
 		position = position->next;
@@ -65,7 +65,7 @@ int	count_length(t_list *storage)
 			if (storage->content[i] == '\n')
 			{
 				length++;
-				break ;
+				return (length);
 			}
 			length++;
 			i++;
@@ -76,7 +76,7 @@ int	count_length(t_list *storage)
 }
 
 /*free storage*/
-void	free_storage(t_list *storage)
+void	ft_free(t_list *storage)
 {
 	t_list	*position;
 	t_list	*next;
@@ -90,7 +90,7 @@ void	free_storage(t_list *storage)
 	}
 }
 
-int	ft_strlen(const char *str)
+int	ft_slen(const char *str)
 {
 	int	i;
 

@@ -12,68 +12,75 @@
 
 #include "get_next_line.h"
 
-int	ft_newline(char *string)
+size_t	ft_strlen(char	*str)
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
-	while (string[i])
-	{
-		if (string[i] == '\n')
-			return (1);
+	if (!str)
+		return (0);
+	while (str[i])
 		i++;
-	}
-	return (0);
+	return (i);
 }
 
-char	*ft_strjoin(char *src, char *dest)
+char	*ft_strchr(char *s, int c)
 {
-	int		i;
-	int		j;
-	int		total_size;
-	char	*newstr;
+	size_t	i;
 
-	i = 0;
-	j = 0;
-	total_size = ft_strlen2(src) + ft_strlen2(dest);
-	newstr = (char *)malloc(sizeof(char) * (total_size + 1));
-	if (!newstr)
-	{
-		free (newstr);
+	if (!s)
 		return (NULL);
-	}
-	while (src[i] != '\0')
+	if (c == 0)
 	{
-		newstr[i] = src[i];
+		i = ft_strlen((char *)s);
+		return (&s[i]);
+	}
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] == (char) c)
+			return (&s[i]);
 		i++;
 	}
-	while (dest[j] != '\0')
+	return (NULL);
+}
+
+char	*ft_strjoin(char *start, char *buff)
+{
+	char	*ptr;
+
+	if (!start)
 	{
-		newstr[i + j] = dest[j];
+		start = (char *)malloc(1 * sizeof(char));
+		start[0] = '\0';
+	}
+	if (!start || !buff)
+		return (NULL);
+	ptr = (char *)malloc(1 + ft_strlen(start) + ft_strlen(buff) * sizeof(char));
+	if (!ptr)
+		return (NULL);
+	ptr = ft_join(ptr, start, buff);
+	free(start);
+	return (ptr);
+}
+
+char	*ft_join(char *dest, char *s1, char *s2)
+{
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	while (s1 && s1[i])
+	{
+		dest[i] = s1[i];
+		i++;
+	}
+	j = 0;
+	while (s2 && s2[j])
+	{
+		dest[i + j] = s2[j];
 		j++;
 	}
-	newstr[i + j] = '\0';
-	return (newstr);
-}
-
-int	ft_strlen(char *string)
-{
-	int	i;
-
-	i = 0;
-	while (string[i] != '\n' && string[i] != '\0')
-		i++;
-	if (string[i] == '\n' || string[i] == '\0')
-		i++;
-	return (i);
-}
-
-int	ft_strlen2(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i] != '\0')
-		i++;
-	return (i);
+	dest[i + j] = '\0';
+	return (dest);
 }

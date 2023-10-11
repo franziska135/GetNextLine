@@ -18,19 +18,35 @@ char	*get_next_line(int fd)
 	static char	*storage;
 
 	output = NULL;
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
-		return (0);
+	if (fd < 0 || BUFFER_SIZE <= 0/* || read(fd, 0, 0) < 0*/)
+		return (NULL);
 	if (!storage)
 	{
 		storage = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
 		if (!storage)
-			return (0);
+			return (NULL);
 	}
 	storage = ft_read_to_storage(fd, storage);
-	if (storage == 0)
+	if (storage == NULL)
+	{
+		free (storage);
+		storage = NULL;
 		return (NULL);
-	output = ft_storage_to_output(storage, output);
+	}
+	output = ft_storage_to_output(storage);
+	if (output == NULL)
+	{
+		free(storage);
+		storage = NULL;
+		return (NULL);
+	}
 	storage = ft_extract_remnant(storage);
+	if (storage == NULL)
+	{
+		free(output);
+		output = NULL;
+		return (NULL);
+	}
 	return (output);
 }
 
@@ -39,31 +55,43 @@ char	*ft_read_to_storage(int fd, char *storage)
 	int		gelesen;
 	char	*new_string;
 
+	//new_string = NULL; otherwise a weird @ sign
 	while (ft_newline(storage) == 0)
 	{
-		new_string = (char *)malloc((sizeof(char) * BUFFER_SIZE) + 1);
+		new_string = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
 		if (!new_string)
-			return (0);
-		gelesen = read(fd, new_string, BUFFER_SIZE);
-		if (gelesen == -1 || gelesen == 0)
 		{
-			if (gelesen == 0)
-			{
-				free(new_string);
-				free(storage);
-			}
+			free(storage);
+			storage = NULL;
 			return (0);
 		}
+		gelesen = read(fd, new_string, BUFFER_SIZE);
+		if (gelesen == -1 || (gelesen == 0))
+		{
+			free(new_string);
+			free(storage);
+			return (NULL);
+		}
 		storage = ft_strjoin(storage, new_string);
+		if (storage == NULL)
+		{
+			free(new_string);
+			new_string = NULL;
+			free(storage);
+			return (NULL);
+		}
 		free(new_string);
+		new_string = NULL;
 	}
 	return (storage);
 }
 
-char	*ft_storage_to_output(char *storage, char *output)
+char	*ft_storage_to_output(char *storage)
 {
-	int	i;
+	int		i;
+	char	*output;
 
+	output = NULL;
 	i = ft_strlen(storage);
 	output = (char *)malloc(sizeof(char) * (i + 1));
 	if (!output)
@@ -88,25 +116,30 @@ char	*ft_extract_remnant(char *storage)
 
 	i = 0;
 	j = 0;
-	if (storage == NULL)
-		return (NULL);
+	// if (!storage)
+	// 	return (NULL);
 	i = ft_strlen(storage);
 	while (storage[i + j] != '\0')
 		j++;
 	remnant_string = (char *)malloc(sizeof(char) * (j + 1));
 	if (!remnant_string)
+	{
+		free(storage);
+		storage = NULL;
 		return (0);
+	}
 	j = 0;
 	while (storage[i + j] != '\0')
 	{
 		remnant_string[j] = storage[i + j];
-		j++;
+		j++;	
 	}
 	remnant_string[j] = '\0';
 	free(storage);
+	storage = NULL;
 	return (remnant_string);
 }
-/*
+
 int	main(int argc, char *argv[])
 {
 		int		file;
@@ -131,4 +164,3 @@ int	main(int argc, char *argv[])
 		close (file);
 		return (0);
 }
-*/

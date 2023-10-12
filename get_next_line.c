@@ -62,8 +62,7 @@ char	*ft_read_to_storage(int fd, char *storage)
 		if (!new_string)
 		{
 			free(storage);
-			storage = NULL;
-			return (0);
+			return (NULL);
 		}
 		gelesen = read(fd, new_string, BUFFER_SIZE);
 		if (gelesen == -1 || (gelesen == 0))
@@ -76,12 +75,12 @@ char	*ft_read_to_storage(int fd, char *storage)
 		if (storage == NULL)
 		{
 			free(new_string);
-			new_string = NULL;
+			//new_string = NULL;
 			free(storage);
 			return (NULL);
 		}
 		free(new_string);
-		new_string = NULL;
+		//new_string = NULL;
 	}
 	return (storage);
 }

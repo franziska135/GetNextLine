@@ -36,12 +36,11 @@ char	*ft_strjoin(char *src, char *dest)
 	i = 0;
 	j = 0;
 	total_size = ft_strlen2(src) + ft_strlen2(dest);
+	// if (newstr)
+	// 	free(newstr);
 	newstr = (char *)malloc(sizeof(char) * (total_size + 1));
 	if (!newstr)
-	{
-		free (newstr);
-		return (NULL);
-	}
+		return (free(newstr), free(src), free(dest), NULL);
 	while (src[i] != '\0')
 	{
 		newstr[i] = src[i];

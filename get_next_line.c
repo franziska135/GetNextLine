@@ -12,87 +12,15 @@
 
 #include "get_next_line.h"
 
-char	*get_next_line(int fd)
-{
-	char		*output;
-	static char	*storage;
-
-	output = NULL;
-	if (fd < 0 || BUFFER_SIZE <= 0/* || read(fd, 0, 0) < 0*/)
-		return (NULL);
-	if (!storage)
-	{
-		storage = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
-		if (!storage)
-			return (NULL);
-	}
-	storage = ft_read_to_storage(fd, storage);
-	if (storage == NULL)
-	{
-		free (storage);
-		storage = NULL;
-		return (NULL);
-	}
-	output = ft_storage_to_output(storage);
-	if (output == NULL)
-	{
-		free(storage);
-		storage = NULL;
-		return (NULL);
-	}
-	storage = ft_extract_remnant(storage);
-	if (storage == NULL)
-	{
-		free(output);
-		output = NULL;
-		return (NULL);
-	}
-	return (output);
-}
-
-char	*ft_read_to_storage(int fd, char *storage)
-{
-	int		gelesen;
-	char	*new_string;
-
-	//new_string = NULL; otherwise a weird @ sign
-	while (ft_newline(storage) == 0)
-	{
-		new_string = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
-		if (!new_string)
-		{
-			free(storage);
-			return (NULL);
-		}
-		gelesen = read(fd, new_string, BUFFER_SIZE);
-		if (gelesen == -1 || (gelesen == 0))
-		{
-			free(new_string);
-			free(storage);
-			return (NULL);
-		}
-		storage = ft_strjoin(storage, new_string);
-		if (storage == NULL)
-		{
-			free(new_string);
-			//new_string = NULL;
-			free(storage);
-			return (NULL);
-		}
-		free(new_string);
-		//new_string = NULL;
-	}
-	return (storage);
-}
-
 char	*ft_storage_to_output(char *storage)
 {
 	int		i;
 	char	*output;
 
-	output = NULL;
-	i = ft_strlen(storage);
-	output = (char *)malloc(sizeof(char) * (i + 1));
+	if (!storage || !storage[0])
+		return (NULL);
+	i = ft_inclusive_strlen(storage);
+	output = (char *)malloc(1 + i * sizeof(char));
 	if (!output)
 		return (NULL);
 	i = 0;
@@ -101,43 +29,70 @@ char	*ft_storage_to_output(char *storage)
 		output[i] = storage[i];
 		i++;
 	}
-	if (storage[i] == '\n' || storage[i] == '\0')
-		output[i] = storage[i];
+	if (storage[i] == '\n')
+		output[i] = '\n';
 	output[++i] = '\0';
 	return (output);
 }
 
-char	*ft_extract_remnant(char *storage)
+char	*ft_move_start(char	*start)
 {
+	char	*new_buff;
 	int		i;
 	int		j;
-	char	*remnant_string;
 
 	i = 0;
+	while (start[i] && start[i] != '\n')
+		i++;
+	if (start[i] == '\0')
+	{
+		free(start);
+		return (NULL);
+	}
+	i += (start[i] == '\n');
+	new_buff = (char *)malloc(1 + ft_strlen(start) - i);
+	if (!new_buff)
+		return (NULL);
 	j = 0;
-	// if (!storage)
-	// 	return (NULL);
-	i = ft_strlen(storage);
-	while (storage[i + j] != '\0')
+	while (start[i + j])
+	{
+		new_buff[j] = start[i + j];
 		j++;
-	remnant_string = (char *)malloc(sizeof(char) * (j + 1));
-	if (!remnant_string)
-	{
-		free(storage);
-		storage = NULL;
-		return (0);
 	}
-	j = 0;
-	while (storage[i + j] != '\0')
-	{
-		remnant_string[j] = storage[i + j];
-		j++;	
-	}
-	remnant_string[j] = '\0';
-	free(storage);
-	storage = NULL;
-	return (remnant_string);
+	new_buff[j] = '\0';
+	free(start);
+	return (new_buff);
 }
+
+char	*get_next_line(int fd)
+{
+	char		*ouput;
+	int			fd_read;
+	static char	*storage;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	fd_read = 1;
+	ouput = (char *)malloc(1 + BUFFER_SIZE * sizeof(char));
+	if (!ouput)
+		return (NULL);
+	while (ft_newline(storage) == 0 && fd_read != 0)
+	{
+		fd_read = read(fd, ouput, BUFFER_SIZE);
+		if (fd_read == -1)
+		{
+			free(ouput);
+			return (NULL);
+		}
+		ouput[fd_read] = '\0';
+		storage = ft_strjoin(storage, ouput);
+	}
+	free(ouput);
+	ouput = ft_storage_to_output(storage);
+	storage = ft_move_start(storage);
+	return (ouput);
+}
+
 
 int	main(int argc, char *argv[])
 {

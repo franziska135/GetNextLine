@@ -12,11 +12,37 @@
 
 #include "get_next_line.h"
 
+int	ft_strlen(char	*str)
+{
+	int	i;
+
+	i = 0;
+	if (!str)
+		return (0);
+	while (str[i])
+		i++;
+	return (i);
+}
+
+int	ft_inclusive_strlen(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] != '\n' && str[i] != '\0')
+		i++;
+	if (str[i] == '\n')
+		i++;
+	return (i);
+}
+
 int	ft_newline(char *string)
 {
 	int	i;
 
 	i = 0;
+	if (!string)
+		return (0);
 	while (string[i])
 	{
 		if (string[i] == '\n')
@@ -26,53 +52,31 @@ int	ft_newline(char *string)
 	return (0);
 }
 
-char	*ft_strjoin(char *src, char *dest)
+char	*ft_strjoin(char *old, char *to_add)
 {
+	char	*joined;
 	int		i;
 	int		j;
 	int		total_size;
-	char	*newstr;
 
-	i = 0;
-	j = 0;
-	total_size = ft_strlen2(src) + ft_strlen2(dest);
-	// if (newstr)
-	// 	free(newstr);
-	newstr = (char *)malloc(sizeof(char) * (total_size + 1));
-	if (!newstr)
-		return (free(newstr), free(src), free(dest), NULL);
-	while (src[i] != '\0')
+	total_size = ft_strlen(old) + ft_strlen(to_add);
+	if (!old)
 	{
-		newstr[i] = src[i];
-		i++;
+		old = (char *)malloc(1 * sizeof(char));
+		old[0] = '\0';
 	}
-	while (dest[j] != '\0')
-	{
-		newstr[i + j] = dest[j];
-		j++;
-	}
-	newstr[i + j] = '\0';
-	return (newstr);
-}
-
-int	ft_strlen(char *string)
-{
-	int	i;
-
-	i = 0;
-	while (string[i] != '\n' && string[i] != '\0')
-		i++;
-	if (string[i] == '\n' || string[i] == '\0')
-		i++;
-	return (i);
-}
-
-int	ft_strlen2(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i] != '\0')
-		i++;
-	return (i);
+	if (!old || !to_add)
+		return (NULL);
+	joined = (char *)malloc(1 + total_size * sizeof(char));
+	if (!joined)
+		return (NULL);
+	i = -1;
+	while (old && old[++i])
+		joined[i] = old[i];
+	j = -1;
+	while (to_add && to_add[++j])
+		joined[i + j] = to_add[j];
+	joined[i + j] = '\0';
+	free(old);
+	return (joined);
 }

@@ -12,27 +12,28 @@
 
 #include "get_next_line.h"
 
-int	ft_strlen(char	*str)
+int	ft_strlen(char *str, char c)
 {
 	int	i;
 
 	i = 0;
 	if (!str)
 		return (0);
-	while (str[i])
+	while (str[i] != c && str[i] != '\0')
 		i++;
 	return (i);
 }
 
-int	ft_inclusive_strlen(char *str)
+int	ft_strcpy(char *dest, char *src, char c, int start)
 {
 	int	i;
 
 	i = 0;
-	while (str[i] != '\n' && str[i] != '\0')
+	while (src[start + i] != '\0' && src[start + i] != c)
+	{
+		dest[i] = src[start + i];
 		i++;
-	if (str[i] == '\n')
-		i++;
+	}
 	return (i);
 }
 
@@ -59,20 +60,20 @@ char	*ft_strjoin(char *old, char *to_add)
 	int		j;
 	int		total_size;
 
-	total_size = ft_strlen(old) + ft_strlen(to_add);
+	total_size = ft_strlen(old, '\0') + ft_strlen(to_add, '\0');
 	if (!old)
 	{
 		old = (char *)malloc(1 * sizeof(char));
+		if (!old)
+			return (free(to_add), NULL);
 		old[0] = '\0';
 	}
 	if (!old || !to_add)
 		return (NULL);
 	joined = (char *)malloc(1 + total_size * sizeof(char));
 	if (!joined)
-		return (NULL);
-	i = -1;
-	while (old && old[++i])
-		joined[i] = old[i];
+		return (free(old), free(to_add), NULL);
+	i = ft_strcpy(joined, old, '\0', 0);
 	j = -1;
 	while (to_add && to_add[++j])
 		joined[i + j] = to_add[j];

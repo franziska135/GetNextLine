@@ -33,15 +33,11 @@
 # include <stdio.h>
 
 int		ft_newline(char *string);
-// char	*ft_join(char *dest, char *s1, char *s2);
-// char	*ft_extract_remnant(char *storage);
-// // int		ft_strlen(char *string);
-// int		ft_strlen2(char *str);
-int		ft_strlen(char *str);
 char	*get_next_line(int fd);
 char	*ft_storage_to_output(char *storage);
-char	*ft_move_start(char *start);
+char	*ft_extract_remnant(char *storage);
 char	*ft_strjoin(char *storage, char *new_string);
-int		ft_inclusive_strlen(char *str);
+int		ft_strlen(char *str, char c);
+int		ft_strcpy(char *dest, char *src, char c, int start);
 
 #endif

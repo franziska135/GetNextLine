@@ -1,0 +1,26 @@
+// int	main(int argc, char *argv[])
+// {
+// 	int		file;
+// 	char	*str;
+
+// 	if (argc == 0)
+// 		return (0);
+// 	file = open(argv[1], O_RDONLY);
+// 	if (file == -1)
+// 	{
+// 		printf("ERROR IN OPENING THE FILE");
+// 		return (0);
+// 	}
+// 	str = get_next_line(file);
+// 	while (str)
+// 	{
+// 		printf("%s", str);
+// 		free (str);
+// 		str = get_next_line(file);
+// 	}
+// 	if (!str)
+// 		printf("NULL");
+// 	free (str);
+// 	close (file);
+// 	return (0);
+// }
